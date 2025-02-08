@@ -1,9 +1,4 @@
 /** @type {import('next').NextConfig} */
-const nextConfig = {
-  // Enable the experimental middleware for app folder
-  experimental: {
-    appDir: true,
-  },
-};
+const nextConfig = {};
 
 export default nextConfig;
