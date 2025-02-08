@@ -39,7 +39,7 @@ export default function UrlDashboard() {
     {
       field: "shortUrl",
       headerName: "Short URL",
-      minWidth: 320,
+      minWidth: 420,
       flex: 1,
       renderCell: (params) => (
         <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
