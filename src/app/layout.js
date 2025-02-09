@@ -19,13 +19,16 @@ export const metadata = {
 };
 
 export default async function RootLayout({ children }) {
-  const { data, error } = await supabase.auth.getSession();
-
+  async function getSession(token) {
+    "use server";
+    const { data, error } = await supabase.auth.getUser(token);
+    return data;
+  }
   return (
     <html lang="en">
       <body className={`${geistSans.variable} ${geistMono.variable}`}>
         <Analytics />
-        <Header session={data.session} />
+        <Header session={null} getSession={getSession} />
         {children}
       </body>
     </html>

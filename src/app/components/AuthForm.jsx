@@ -27,18 +27,10 @@ export default function AuthForm() {
     setError("");
 
     try {
-      // Retrieve the token from localStorage
-      const token = localStorage.getItem("supabase-token");
-      if (!token) {
-        // Redirect or show an error if token is not found
-        console.error("No token found, please log in.");
-        return;
-      }
       const response = await fetch(isSignup ? "/api/signup" : "/api/login", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "Authorization": `Bearer ${token}`
         },
         body: JSON.stringify({ email, password }),
       });
@@ -48,11 +40,12 @@ export default function AuthForm() {
       if (response.ok) {
         // Store the JWT token in localStorage
         localStorage.setItem("supabase-token", data.token);
+        localStorage.setItem("user", JSON.stringify(data.user));
         setOpenSnackbar(true);
-        router.push("/dashboard");
         setTimeout(() => {
+          router.push("/dashboard");
+          setLoading(false);
         }, 2000);
-        setLoading(false);
       } else {
         setError(data.error || "Something went wrong, please try again.");
         setLoading(false);

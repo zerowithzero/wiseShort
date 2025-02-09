@@ -3,7 +3,7 @@ import UrlDashboard from "../components/UrlDashboard";
 
 export default function Dashboard() {
   return (
-    <Container maxWidth="lg">
+    <Container maxWidth="lg" sx={{ width: "100vw" }}>
       <Box mt={5} textAlign="center">
         <Typography variant="h4" fontWeight="bold" mb={2}>
           🔗 URL Analytics Dashboard
