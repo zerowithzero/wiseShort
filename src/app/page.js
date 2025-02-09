@@ -3,7 +3,7 @@ import ShortenerForm from "./components/ShortenForm";
 
 export default function Home() {
   return (
-    <Container maxWidth="md">
+    <Container maxWidth="md" sx={{width: '100vw'}}>
       <Box textAlign="center" mt={5} mb={5}>
         <Typography variant="h4" fontWeight="bold" mb={2}>
           🚀 Fast & Secure URL Shortener

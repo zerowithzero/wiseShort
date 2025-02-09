@@ -27,7 +27,7 @@ export async function POST(req) {
       email,
       password,
     });
-
+    await supabase.auth.refreshSession();
     if (error) {
       return NextResponse.json({ error: error.message }, { status: 400 });
     }
@@ -43,8 +43,20 @@ export async function POST(req) {
         { status: 400 }
       );
     }
+    // Set the token in a cookie
+    const response = NextResponse.json({
+      session: data.session,
+      user: data.user,
+      token,
+    });
+    // Set the token in a secure, HTTP-only cookie
+    response.cookies.set("supabase_token", token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production", // Make sure this is only sent in secure environments
+      path: "/",
+    });
 
-    return NextResponse.json({ session: data.session, user: data.user, token });
+    return response;
   } catch (error) {
     console.error("Error during login:", error);
     return NextResponse.json(

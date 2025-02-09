@@ -23,7 +23,7 @@ export async function POST(req) {
 
   try {
     // Sign up the user with email and password
-    const { user, error } = await supabase.auth.signUp({
+    const { error } = await supabase.auth.signUp({
       email,
       password,
     });
@@ -31,11 +31,37 @@ export async function POST(req) {
     if (error) {
       return NextResponse.json({ error: error.message }, { status: 400 });
     }
+    const {
+      data: { session, user },
+      error: loginError,
+    } = await supabase.auth.signInWithPassword({
+      email: email,
+      password: password,
+    });
 
-    // Optionally send a verification email
-    // await supabase.auth.api.sendVerificationEmail(email);
+    if (loginError) {
+      return NextResponse.json({ error: loginError.message }, { status: 400 });
+    }
 
-    return NextResponse.json({ user });
+    const token = session?.access_token;
+    if (!token) {
+      return NextResponse.json(
+        { error: "No access token found" },
+        { status: 400 }
+      );
+    }
+    // Set the token in a cookie
+    const response = NextResponse.json({
+      user,
+    });
+    // Set the token in a secure, HTTP-only cookie
+    response.cookies.set("supabase_token", token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production", // Make sure this is only sent in secure environments
+      path: "/",
+    });
+
+    return response;
   } catch (error) {
     console.error("Error during signup:", error);
     return NextResponse.json(

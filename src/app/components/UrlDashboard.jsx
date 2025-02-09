@@ -8,6 +8,12 @@ import {
   CircularProgress,
   Snackbar,
   Alert,
+  useTheme,
+  useMediaQuery,
+  Card,
+  CardContent,
+  CardActions,
+  Button,
 } from "@mui/material";
 import { DataGrid } from "@mui/x-data-grid";
 import ContentCopyIcon from "@mui/icons-material/ContentCopy";
@@ -19,6 +25,9 @@ export default function UrlDashboard() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [copied, setCopied] = useState(false);
+
+  const theme = useTheme();
+  const isSmallScreen = useMediaQuery(theme.breakpoints.down("sm"));
 
   useEffect(() => {
     async function fetchUrls() {
@@ -34,6 +43,7 @@ export default function UrlDashboard() {
     fetchUrls();
   }, []);
 
+  // Columns for DataGrid view
   const columns = [
     { field: "id", headerName: "ID", width: 80 },
     {
@@ -65,15 +75,77 @@ export default function UrlDashboard() {
     { field: "createdAt", headerName: "Created At", width: 180, flex: 1 },
   ];
 
-  return (
-    <Box sx={{ maxWidth: "100%", mx: "auto", p: 3 }}>
-      <Typography variant="h5" fontWeight="bold" mb={2}>
-        📊 URL Dashboard
-      </Typography>
+  if (loading) {
+    return (
+      <Box sx={{ display: "flex", justifyContent: "center", p: 4 }}>
+        <CircularProgress />
+      </Box>
+    );
+  }
 
+  return (
+    <Box
+      sx={{
+        maxWidth: "100%",
+        mx: "auto",
+        p: 3,
+        maxHeight: "65vh",
+        overflowY: "auto",
+        scrollbarWidth: "none", // Firefox
+        msOverflowStyle: "none", // Internet Explorer 10+
+        "&::-webkit-scrollbar": {
+          display: "none", // Chrome, Safari, Opera
+        },
+      }}
+    >
       {error ? (
         <Alert severity="error">{error}</Alert>
+      ) : isSmallScreen ? (
+        // Render as cards for small screens
+        <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
+          {urls.map((row) => (
+            <Card key={row.id} sx={{ p: 2 }}>
+              <CardContent>
+                <Typography variant="subtitle1" fontWeight="bold">
+                  Short URL:
+                </Typography>
+                <Typography variant="body2" sx={{ wordBreak: "break-all" }}>
+                  {row.shortUrl}
+                </Typography>
+                <Typography variant="subtitle1" fontWeight="bold" mt={1}>
+                  Long URL:
+                </Typography>
+                <Typography variant="body2" sx={{ wordBreak: "break-all" }}>
+                  {row.longUrl}
+                </Typography>
+                <Typography variant="subtitle1" fontWeight="bold" mt={1}>
+                  Clicks:
+                </Typography>
+                <Typography variant="body2">{row.clickCount}</Typography>
+                <Typography variant="subtitle1" fontWeight="bold" mt={1}>
+                  Created At:
+                </Typography>
+                <Typography variant="body2">{row.createdAt}</Typography>
+              </CardContent>
+              <CardActions>
+                <CopyToClipboard
+                  text={row.shortUrl}
+                  onCopy={() => setCopied(true)}
+                >
+                  <Button
+                    size="small"
+                    color="primary"
+                    startIcon={<ContentCopyIcon />}
+                  >
+                    Copy URL
+                  </Button>
+                </CopyToClipboard>
+              </CardActions>
+            </Card>
+          ))}
+        </Box>
       ) : (
+        // Render DataGrid for medium and larger screens
         <DataGrid
           rows={urls}
           columns={columns}
@@ -82,11 +154,9 @@ export default function UrlDashboard() {
           sx={{ bgcolor: "background.paper", borderRadius: 2, boxShadow: 1 }}
           autoHeight
           disableRowSelectionOnClick
-          loading={loading}
         />
       )}
 
-      {/* Copy Notification */}
       <Snackbar
         open={copied}
         autoHideDuration={2000}

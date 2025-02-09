@@ -40,3 +40,16 @@ a {
     color-scheme: dark;
   }
 }
+
+@keyframes rotate360 {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+.logo-rotate {
+  animation: rotate360 4s linear infinite;
+  border-radius: 50%;
+}
